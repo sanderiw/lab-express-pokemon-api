@@ -30,7 +30,7 @@ app.get("/pokemon/:id", (req, res) => {
     return res.status(400).json({ msg: "Pokemon not found" });
 });
 
-// Get pokemons searching by name
+// Get pokemons searching by name or type
 app.get("/search", (req, res) => {
     console.log(Object.keys(req.query));
     if (req.query.name) {
@@ -55,6 +55,41 @@ app.get("/search", (req, res) => {
         }
     }
     return res.status(404).json({ msg: "Search not found" });
+});
+
+// Post to insert new Pokemon
+app.post("/pokemon", (req, res) => {
+    const data = { ...req.body, id: allPokemon[allPokemon.length - 1].id + 1 };
+    allPokemon.push(data);
+
+    res.status(201).json(data);
+});
+
+// Put to replace data
+app.put("/pokemon/:id", (req, res) => {
+    const foundPokemonId = allPokemon.findIndex((pokemonObj) => {
+        return pokemonObj.id.toString() === req.params.id;
+    });
+    if (foundPokemonId > -1) {
+        const updatedData = { ...allPokemon[foundPokemonId], ...req.body };
+        allPokemon[foundPokemonId] = updatedData;
+        return res.status(200).json(updatedData);
+    }
+    return res.status(404).json({ msg: "Pokemon not found" });
+});
+
+// Delete to delete a pokemon entry
+app.delete("/pokemon/:id", (req, res) => {
+    const foundPokemonId = allPokemon.findIndex((pokemonObj) => {
+        return pokemonObj.id.toString() === req.params.id;
+    });
+
+    if (foundPokemonId > -1) {
+        allPokemon.splice(foundPokemonId, 1);
+        return res.status(200).json({});
+    }
+
+    return res.status(404).json({ msg: "Pokemon not found" });
 });
 
 // -- Define your route listeners here! --
